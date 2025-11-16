@@ -1,0 +1,10 @@
+# build directory
+build/
+!build/build.sh
+
+# garbage & dev stuff
+test*
+*.log
+
+# custom configs
+.clangd
