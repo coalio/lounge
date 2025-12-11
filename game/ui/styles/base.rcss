@@ -1,0 +1,14 @@
+body {
+    font-family: "Stereofidelic";
+    font-weight: normal;
+    color: #ffffff;
+    background-color: transparent;
+}
+
+button {
+    background-color: transparent;
+    border-width: 0px;
+    border-color: transparent;
+    color: #ffffff;
+}
+

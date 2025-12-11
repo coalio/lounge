@@ -9,6 +9,10 @@ void SceneRenderer::build_queue(const game::GameState& state, engine::render::Re
 
     queue.push_back(engine::render::Clear{engine::core::COLOR_BLACK});
 
+    if (!state.gameplay_active) {
+        return;
+    }
+
     const float half = state.player_size * 0.5F;
     const engine::core::Rect rect{
         state.player_pos.x - half,

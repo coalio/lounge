@@ -2,6 +2,10 @@
 
 #include "engine/pipeline/pipeline.hpp"
 #include "engine/render/render_queue.hpp"
+#include "game/pipeline/stages/input_stage.hpp"
+#include "game/pipeline/stages/logic_stage.hpp"
+#include "game/pipeline/stages/render_stage.hpp"
+#include "game/pipeline/stages/ui_stage.hpp"
 
 namespace engine::input {
 class InputHandler;
@@ -14,6 +18,10 @@ class Renderer;
 
 namespace engine::platform {
 class SdlPlatform;
+}
+
+namespace engine::ui {
+class UiSystem;
 }
 
 namespace game {
@@ -33,6 +41,8 @@ struct GameContext {
     game::GameState& game_state;
     engine::render::RenderQueue& render_queue;
     game::render::SceneRenderer& scene_renderer;
+    engine::render::Renderer& renderer;
+    engine::ui::UiSystem& ui_system;
     float dt{0.0F};
     bool running{true};
 };
@@ -50,6 +60,10 @@ public:
 
 private:
     engine::pipeline::Pipeline<GameContext> pipeline_{};
+    stages::InputStage input_stage_{};
+    stages::LogicStage logic_stage_{};
+    stages::UiStage ui_stage_{};
+    stages::RenderStage render_stage_{};
 };
 
 }  // namespace game::pipeline

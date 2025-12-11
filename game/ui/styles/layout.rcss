@@ -1,0 +1,13 @@
+.center-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 500px;
+    width: 100%;
+}
+
+.screen-content {
+    width: 100%;
+}
+

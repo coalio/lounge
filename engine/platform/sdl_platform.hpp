@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL.h>
 #include <cstdint>
 #include <expected>
 #include <string_view>
@@ -37,6 +38,48 @@ private:
     std::uint64_t perf_freq_{0};
     std::uint64_t last_counter_{0};
 };
+
+inline SdlPlatform::SdlPlatform(SdlPlatform&& other) noexcept
+    : window_{other.window_},
+      width_{other.width_},
+      height_{other.height_},
+      perf_freq_{other.perf_freq_},
+      last_counter_{other.last_counter_} {
+    other.window_ = nullptr;
+    other.width_ = 0;
+    other.height_ = 0;
+    other.perf_freq_ = 0;
+    other.last_counter_ = 0;
+}
+
+inline auto SdlPlatform::operator=(SdlPlatform&& other) noexcept -> SdlPlatform& {
+    if (this != &other) {
+        if (window_ != nullptr) {
+            SDL_DestroyWindow(window_);
+            SDL_Quit();
+        }
+        window_ = other.window_;
+        width_ = other.width_;
+        height_ = other.height_;
+        perf_freq_ = other.perf_freq_;
+        last_counter_ = other.last_counter_;
+
+        other.window_ = nullptr;
+        other.width_ = 0;
+        other.height_ = 0;
+        other.perf_freq_ = 0;
+        other.last_counter_ = 0;
+    }
+    return *this;
+}
+
+inline SdlPlatform::~SdlPlatform() {
+    if (window_ != nullptr) {
+        SDL_DestroyWindow(window_);
+        window_ = nullptr;
+        SDL_Quit();
+    }
+}
 
 }  // namespace engine::platform
 

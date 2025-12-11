@@ -2,7 +2,6 @@
 
 #include <SDL.h>
 #include <string>
-#include <utility>
 
 namespace engine::platform {
 
@@ -18,7 +17,7 @@ auto SdlPlatform::create(int width, int height, std::string_view title)
         SDL_WINDOWPOS_CENTERED,
         width,
         height,
-        SDL_WINDOW_SHOWN
+        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
     );
 
     if (window == nullptr) {
@@ -43,48 +42,6 @@ SdlPlatform::SdlPlatform(SDL_Window* window,
       height_{height},
       perf_freq_{perf_freq},
       last_counter_{last_counter} {}
-
-SdlPlatform::SdlPlatform(SdlPlatform&& other) noexcept
-    : window_{other.window_},
-      width_{other.width_},
-      height_{other.height_},
-      perf_freq_{other.perf_freq_},
-      last_counter_{other.last_counter_} {
-    other.window_ = nullptr;
-    other.width_ = 0;
-    other.height_ = 0;
-    other.perf_freq_ = 0;
-    other.last_counter_ = 0;
-}
-
-auto SdlPlatform::operator=(SdlPlatform&& other) noexcept -> SdlPlatform& {
-    if (this != &other) {
-        if (window_ != nullptr) {
-            SDL_DestroyWindow(window_);
-            SDL_Quit();
-        }
-        window_ = other.window_;
-        width_ = other.width_;
-        height_ = other.height_;
-        perf_freq_ = other.perf_freq_;
-        last_counter_ = other.last_counter_;
-
-        other.window_ = nullptr;
-        other.width_ = 0;
-        other.height_ = 0;
-        other.perf_freq_ = 0;
-        other.last_counter_ = 0;
-    }
-    return *this;
-}
-
-SdlPlatform::~SdlPlatform() {
-    if (window_ != nullptr) {
-        SDL_DestroyWindow(window_);
-        window_ = nullptr;
-        SDL_Quit();
-    }
-}
 
 auto SdlPlatform::width() const noexcept -> int {
     return width_;

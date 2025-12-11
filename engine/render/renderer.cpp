@@ -5,7 +5,7 @@
 
 #include <SDL.h>
 #include <cmath>
-#include <utility>
+#include <string>
 
 namespace engine::render {
 
@@ -25,8 +25,11 @@ inline auto to_sdl_rect(const core::Rect rect) noexcept -> SDL_Rect {
 
 }  // namespace
 
-auto Renderer::create(engine::platform::SdlPlatform& platform)
+auto Renderer::create(engine::platform::SdlPlatform& platform,
+                      const engine::config::GameSettings& game_settings)
     -> std::expected<Renderer, std::string> {
+    const auto render_settings = game_settings.render;
+
     SDL_Renderer* r = SDL_CreateRenderer(
         platform.native_window(),
         -1,
@@ -37,32 +40,21 @@ auto Renderer::create(engine::platform::SdlPlatform& platform)
         return std::unexpected(std::string{"SDL_CreateRenderer failed: "} + SDL_GetError());
     }
 
-    return Renderer{r};
-}
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
-Renderer::Renderer(SDL_Renderer* renderer) noexcept : renderer_{renderer} {}
-
-Renderer::Renderer(Renderer&& other) noexcept : renderer_{other.renderer_} {
-    other.renderer_ = nullptr;
-}
-
-auto Renderer::operator=(Renderer&& other) noexcept -> Renderer& {
-    if (this != &other) {
-        if (renderer_ != nullptr) {
-            SDL_DestroyRenderer(renderer_);
-        }
-        renderer_ = other.renderer_;
-        other.renderer_ = nullptr;
+    if (SDL_RenderSetLogicalSize(r, render_settings.target_width, render_settings.target_height) != 0) {
+        SDL_DestroyRenderer(r);
+        return std::unexpected(std::string{"SDL_RenderSetLogicalSize failed: "} + SDL_GetError());
     }
-    return *this;
+
+    SDL_RenderSetIntegerScale(r, SDL_FALSE);
+
+    return Renderer{r, render_settings};
 }
 
-Renderer::~Renderer() {
-    if (renderer_ != nullptr) {
-        SDL_DestroyRenderer(renderer_);
-        renderer_ = nullptr;
-    }
-}
+Renderer::Renderer(SDL_Renderer* renderer, engine::config::RenderSettings render_settings) noexcept
+    : renderer_{renderer},
+      render_settings_{render_settings} {}
 
 void Renderer::begin_frame() noexcept {
     // no-op; Clear is driven by the queue

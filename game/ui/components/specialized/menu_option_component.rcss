@@ -1,0 +1,13 @@
+.label.option {
+    font-size: 28px;
+    padding: 12px 24px;
+    border-width: 2px;
+    border-color: #ffffff;
+    border-radius: 6px;
+}
+
+.label.option:hover {
+    background-color: #ffffff;
+    color: #111111;
+}
+

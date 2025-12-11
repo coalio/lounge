@@ -1,0 +1,4 @@
+<body class="screen-start">
+    {{SCREEN_CONTENT}}
+</body>
+

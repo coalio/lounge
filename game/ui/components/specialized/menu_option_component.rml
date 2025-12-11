@@ -1,0 +1,4 @@
+<button class="label option">
+    {{OPTION_TEXT}}
+</button>
+

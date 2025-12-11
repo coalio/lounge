@@ -1,0 +1,13 @@
+.screen-gameplay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    padding: 24px;
+}
+
+.gameplay-instructions {
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+

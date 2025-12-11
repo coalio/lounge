@@ -8,10 +8,13 @@
 namespace engine::input {
 
 void InputHandler::update(InputState& state) noexcept {
+    events_.clear();
     state.reset();
 
     SDL_Event e;
     while (SDL_PollEvent(&e) == 1) {
+        events_.push_back(e);
+
         if (e.type == SDL_QUIT) {
             state.quit = true;
         }
@@ -26,6 +29,10 @@ void InputHandler::update(InputState& state) noexcept {
     state.down = keys[SDL_SCANCODE_S] != 0;
     state.left = keys[SDL_SCANCODE_A] != 0;
     state.right = keys[SDL_SCANCODE_D] != 0;
+}
+
+auto InputHandler::events() const noexcept -> const std::vector<SDL_Event>& {
+    return events_;
 }
 
 }  // namespace engine::input

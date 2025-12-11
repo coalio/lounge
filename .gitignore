@@ -5,6 +5,7 @@ build/
 # garbage & dev stuff
 test*
 *.log
+*.md
 
 # custom configs
 .clangd

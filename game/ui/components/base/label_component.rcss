@@ -1,0 +1,10 @@
+.label {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.label.option {
+    cursor: pointer;
+}
+

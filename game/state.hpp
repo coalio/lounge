@@ -11,6 +11,7 @@ struct GameState {
     engine::core::Vec2 player_pos{};
     float player_size{::game::PLAYER_SIZE};
     float player_speed{::game::PLAYER_SPEED};
+    bool gameplay_active{false};
 };
 
 }  // namespace game
