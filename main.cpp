@@ -1,6 +1,7 @@
 #include <expected>
 #include <filesystem>
 #include <iostream>
+#include <system_error>
 
 #include "engine/config/config.hpp"
 #include "engine/platform/sdl_platform.hpp"
@@ -15,9 +16,17 @@ namespace game {
 
 auto main() -> int {
 	constexpr const char* WINDOW_TITLE = "Lounge";
-	constexpr const char* CONFIG_PATH = "config/game.toml";
 
-	const auto config_result = engine::config::ConfigService::load(CONFIG_PATH);
+	std::error_code work_dir_error{};
+	const auto work_dir = std::filesystem::current_path(work_dir_error);
+	if (work_dir_error) {
+		std::cerr << "Failed to determine working directory: " << work_dir_error.message()
+		          << std::endl;
+		return 1;
+	}
+
+	const auto config_path = work_dir / "config/game.toml";
+	const auto config_result = engine::config::ConfigService::load(config_path.string());
 	if (!config_result.has_value()) {
 		std::cerr << "Config load failed: " << config_result.error() << std::endl;
 		return 1;
@@ -46,9 +55,7 @@ auto main() -> int {
 
 	auto renderer = std::move(renderer_expected.value());
 
-	const std::filesystem::path asset_root = std::filesystem::path{LOUNGE_ASSET_ROOT};
-	engine::resources::ResourceManager resources{asset_root};
-
+	engine::resources::ResourceManager resources{work_dir};
 	game::run_game(platform, renderer, resources);
 
 	return 0;

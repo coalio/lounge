@@ -63,7 +63,6 @@ target_include_directories(lounge
 # allow plain main() for SDL and expose asset root
 target_compile_definitions(lounge PRIVATE
     SDL_MAIN_HANDLED
-    LOUNGE_ASSET_ROOT="${CMAKE_SOURCE_DIR}"
 )
 
 # link SDL2
