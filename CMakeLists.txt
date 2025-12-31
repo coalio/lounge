@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.20)
 
 project(lounge LANGUAGES CXX)
 
+# for clangd and other tooling
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # force C++23
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
