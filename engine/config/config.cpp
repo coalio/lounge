@@ -14,6 +14,7 @@ namespace {
 
 struct ConfigStore {
     GameSettings config{};
+    std::filesystem::path path{};
 };
 
 auto store() -> ConfigStore& {
@@ -21,7 +22,7 @@ auto store() -> ConfigStore& {
     return instance;
 }
 
-auto write_default_config(const std::filesystem::path& config_path)
+auto write_config(const std::filesystem::path& config_path, const GameSettings& settings)
     -> std::expected<void, std::string> {
     if (config_path.has_parent_path()) {
         std::error_code err{};
@@ -41,14 +42,18 @@ auto write_default_config(const std::filesystem::path& config_path)
         return std::unexpected(oss.str());
     }
 
-    const auto& defaults = DEFAULT_GAME_SETTINGS;
-
-    if (defaults.render.target_width != 0 || defaults.render.target_height != 0) {
+    if (settings.render.target_width != 0 || settings.render.target_height != 0) {
         file << "[render]\n";
-        file << "target_width = " << defaults.render.target_width << "\n";
-        file << "target_height = " << defaults.render.target_height << "\n";
+        file << "target_width = " << settings.render.target_width << "\n";
+        file << "target_height = " << settings.render.target_height << "\n";
         file << "\n";
     }
+
+    file << "[telegram]\n";
+    file << "api_id = " << settings.telegram.api_id << "\n";
+    file << "api_hash = \"" << settings.telegram.api_hash << "\"\n";
+    file << "save_credentials = " << (settings.telegram.save_credentials ? "true" : "false") << "\n";
+    file << "\n";
 
     if (!file.good()) {
         std::ostringstream oss;
@@ -116,8 +121,11 @@ inline auto parse_render_settings(const toml::table& table,
 auto ConfigService::load(std::string_view path) -> std::expected<void, std::string> {
     const std::filesystem::path config_path{path};
 
+    auto& cfg_store = store();
+    cfg_store.path = config_path;
+
     if (!std::filesystem::exists(config_path)) {
-        auto create_result = write_default_config(config_path);
+        auto create_result = write_config(config_path, DEFAULT_GAME_SETTINGS);
         if (!create_result.has_value()) {
             return create_result;
         }
@@ -136,7 +144,28 @@ auto ConfigService::load(std::string_view path) -> std::expected<void, std::stri
             config.render = render_expected.value();
         }
 
-        auto& cfg_store = store();
+        if (const auto telegram_table = table["telegram"].as_table()) {
+            if (const auto api_id_node = telegram_table->get("api_id")) {
+                if (const auto api_id_value = api_id_node->value<int64_t>()) {
+                    auto api_expected = narrow_int("telegram.api_id", *api_id_value);
+                    if (!api_expected.has_value()) {
+                        return std::unexpected(api_expected.error());
+                    }
+                    config.telegram.api_id = api_expected.value();
+                }
+            }
+            if (const auto api_hash_node = telegram_table->get("api_hash")) {
+                if (const auto api_hash_value = api_hash_node->value<std::string>()) {
+                    config.telegram.api_hash = *api_hash_value;
+                }
+            }
+            if (const auto save_node = telegram_table->get("save_credentials")) {
+                if (const auto save_value = save_node->value<bool>()) {
+                    config.telegram.save_credentials = *save_value;
+                }
+            }
+        }
+
         cfg_store.config = config;
 
         return {};
@@ -149,6 +178,19 @@ auto ConfigService::load(std::string_view path) -> std::expected<void, std::stri
 
 auto ConfigService::ref() -> const GameSettings& {
     return store().config;
+}
+
+auto ConfigService::set_telegram_credentials(int api_id, std::string api_hash)
+    -> std::expected<void, std::string> {
+    auto& cfg_store = store();
+    cfg_store.config.telegram.api_id = api_id;
+    cfg_store.config.telegram.api_hash = std::move(api_hash);
+
+    if (cfg_store.path.empty()) {
+        return {};
+    }
+
+    return write_config(cfg_store.path, cfg_store.config);
 }
 
 }  // namespace engine::config

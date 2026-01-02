@@ -8,11 +8,13 @@ namespace game::ui::start_menu {
 namespace {
 
 constexpr std::string_view kGameplayScreenId = "gameplay";
+constexpr std::string_view kJoinFriendScreenId = "join_friend";
 
 }  // namespace
 
-StartMenuScreen::StartMenuScreen(game::GameState& state)
-    : state_{&state} {}
+StartMenuScreen::StartMenuScreen(game::GameState& state, game::state::ChatStore& chat_store)
+    : state_{&state},
+      chat_store_{&chat_store} {}
 
 auto StartMenuScreen::id() const noexcept -> std::string_view {
     return kId;
@@ -62,11 +64,15 @@ void StartMenuScreen::on_detach() {
 
 void StartMenuScreen::handle_join_friend() {
     if (state_ != nullptr) {
-        state_->gameplay_active = true;
+        state_->gameplay_active = false;
+        state_->backend_connecting = true;
+    }
+    if (chat_store_ != nullptr) {
+        chat_store_->dispatch(game::state::ResetChats{});
     }
 
     if (host_ != nullptr) {
-        host_->push_screen(kGameplayScreenId);
+        host_->push_screen(kJoinFriendScreenId);
         host_->pop_screen(kId);
     }
 }

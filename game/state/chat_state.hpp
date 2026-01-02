@@ -4,18 +4,10 @@
 #include <vector>
 
 #include "engine/backend/backend_types.hpp"
-#include "engine/core/types.hpp"
 
-namespace game {
+namespace game::state {
 
-inline constexpr float PLAYER_SIZE = 32.0F;
-inline constexpr float PLAYER_SPEED = 200.0F;
-
-struct GameState {
-    engine::core::Vec2 player_pos{};
-    float player_size{::game::PLAYER_SIZE};
-    float player_speed{::game::PLAYER_SPEED};
-    bool gameplay_active{false};
+struct ChatState {
     bool backend_ready{false};
     bool backend_connecting{false};
     std::optional<engine::backend::ChatId> selected_chat{};
@@ -23,6 +15,6 @@ struct GameState {
     std::vector<engine::backend::Message> chat_history{};
 };
 
-}  // namespace game
+}  // namespace game::state
 
 

@@ -1,0 +1,5 @@
+<body class="screen-join-friend">
+    {{SCREEN_CONTENT}}
+</body>
+
+

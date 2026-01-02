@@ -65,6 +65,12 @@ void Renderer::flush(const RenderQueue& queue) noexcept {
         std::visit(
             [this](const auto& c) {
                 using T = std::decay_t<decltype(c)>;
+
+                // instead of these two lame handlers we'll have to have an entity map
+                // with ids so that we have specific handlers for every kind of entity
+                // we're handling only game rendering here bc we treat UI and HUD as "scenes".
+                // the gameplay is practically the exact same space but different maps and different objects in them
+                // so we can just be careful with the HUD and let the gameplay be independent here
                 if constexpr (std::is_same_v<T, Clear>) {
                     set_draw_color(renderer_, c.color);
                     SDL_RenderClear(renderer_);

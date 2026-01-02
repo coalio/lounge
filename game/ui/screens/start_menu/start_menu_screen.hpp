@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "engine/ui/ui_screen.hpp"
+#include "game/state/chat_store.hpp"
 #include "game/state.hpp"
 #include "game/ui/components/specialized/option_list_component.hpp"
 #include "game/ui/components/specialized/title_component.hpp"
@@ -14,7 +15,7 @@ class StartMenuScreen : public engine::ui::UiScreen {
 public:
     static constexpr std::string_view kId = "start_menu";
 
-    explicit StartMenuScreen(game::GameState& state);
+    StartMenuScreen(game::GameState& state, game::state::ChatStore& chat_store);
 
     [[nodiscard]] auto id() const noexcept -> std::string_view override;
     [[nodiscard]] auto build() -> engine::ui::UiScreenBuildResult override;
@@ -26,6 +27,7 @@ private:
     [[nodiscard]] auto build_options() -> std::vector<game::ui::components::MenuOptionProps>;
 
     game::GameState* state_{nullptr};
+    game::state::ChatStore* chat_store_{nullptr};
     engine::ui::UiScreenHost* host_{nullptr};
 };
 

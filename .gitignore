@@ -9,3 +9,7 @@ test*
 
 # custom configs
 .clangd
+config
+
+# db
+td_db/
